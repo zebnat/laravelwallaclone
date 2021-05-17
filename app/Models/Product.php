@@ -20,4 +20,8 @@ class Product extends Model
     public function photos(){
         return $this->hasMany(Photo::class);
     }
+
+    public function mainphoto(){
+        return $this->hasMany(Photo::class)->where('is_main', '=', 1);
+    }
 }

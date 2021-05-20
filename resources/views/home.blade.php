@@ -12,7 +12,7 @@
                         <div class="control">
                             <div class="select">
                                 <select id="category" name="cat">
-                                    <option value="">Todo</option>
+                                    <option value=""></option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
                                     <option value="3">3</option>
@@ -32,14 +32,16 @@
                     <div class="field">
                         <label class="label" for="minprice">Precio mínimo</label>
                         <div class="control">
-                            <input class="input" id="minprice" type="number" name="minPrice" placeholder="0" value="">
+                            <input class="input @error('minPrice') is-danger @enderror" id="minprice" type="number" name="minPrice" placeholder="0" value="">
                         </div>
+                        @error('minPrice') <small>{{ $message }}</small>@enderror
                     </div>
                     <div class="field">
                         <label class="label" for="maxprice">Precio máximo</label>
                         <div class="control">
-                            <input class="input" id="maxprice" type="number" name="maxPrice" placeholder="0" value="">
+                            <input class="input @error('maxPrice') is-danger @enderror" id="maxprice" type="number" name="maxPrice" placeholder="0" value="">
                         </div>
+                        @error('maxPrice') <small>{{ $message }}</small>@enderror
                     </div>
                 </div>
                 <div class="column">
@@ -80,24 +82,28 @@
     </div>
 </section>
 <section class="section">
-<p>$NUM Products</p>
+<p>{{ count($products) }} Product(s)</p>
 </section>
 <section class="section columns is-multiline">
-    <a class="card column is-one-quarter" href="{{ route('product', 1) }}">
+    @foreach($products as $product)
+    <a class="card column is-one-quarter" href="{{ route('product', $product->id) }}">
+        @foreach($product->mainphoto as $mainphoto)
         <div class="card-image">
             <figure class="image is-4by3">
-                <img class="product-image-thumb" src="/images/1.jpg" alt="">
+                <img class="product-image-thumb" src="/storage/photos/{{ $mainphoto->id . '.'. $mainphoto->extension }}" alt="">
             </figure>
         </div>
+        @endforeach
         <div class="card-content">
             <div class="media-content">
-                <p class="title is-4">ProductName</p>
-                <p class="subtitle is-6">ProductPrice</p>
-                <p class="subtitle is-7">ProductCat</p>
+                <p class="title is-4">{{ $product->name }}</p>
+                <p class="subtitle is-6">{{ $product->price }}€</p>
+                <p class="subtitle is-7">{{ $product->category->name }}</p>
             </div>
 
-            <div class="content">$PRODDESC</div>
+            <div class="content">{{ $product->description }}</div>
         </div>
     </a>
+    @endforeach
 </section>
 @endsection

@@ -20,10 +20,15 @@ class ProductController extends Controller
     }
 
     public function create(Request $req) {
+        $req->validate([
+            'productName' => 'required|string|max:100',
+            'description' => 'required|string|max:255',
+            'price' => 'required|numeric|between:0,1000000',
+            'img1' => 'required|file|image',
+            'category' => 'required'
+        ]);
+
         $mandatoryFile = $req->file('img1');
-        if($mandatoryFile == null) {
-            return redirect(route('create_product'));
-        }
 
         $p = new Product;
         $p->name = $req->productName;
@@ -61,6 +66,12 @@ class ProductController extends Controller
     }
 
     public function update(Request $req, $id) {
+        $req->validate([
+            'name' => 'required|string|max:100',
+            'description' => 'required|string|max:255',
+            'price' => 'required|numeric|between:0,1000000'
+        ]);
+
         $p = Product::find($id);
         $p->name = $req->name;
         $p->description = $req->description;

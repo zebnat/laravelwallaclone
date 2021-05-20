@@ -20,6 +20,7 @@ class ProductController extends Controller
     }
 
     public function create(Request $req) {
+
         $req->validate([
             'productName' => 'required|string|max:100',
             'description' => 'required|string|max:255',
@@ -35,7 +36,7 @@ class ProductController extends Controller
         $p->description = $req->description;
         $p->price = $req->price;
         $p->visits = 0;
-        $p->category_id = 1; // @TODO undo this hardcoded category
+        $p->category_id = $req->category;
         $p->user_id = auth()->id();
         $p->save();
 
@@ -78,7 +79,8 @@ class ProductController extends Controller
         $p->price = $req->price;
         $p->save();
 
-        return redirect(route('edit_product', $p->id));
+        //return redirect(route('edit_product', $p->id));
+        return redirect()->back()->with('success', true);
     }
 
     public function remove($id) {

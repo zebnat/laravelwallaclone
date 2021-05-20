@@ -32,8 +32,6 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/private', [PrivateController::class, 'show'])->name('private');
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/private/create-product', function () {
-    return view('create_product');
-})->name('create_product');
+Route::middleware(['auth:sanctum', 'verified'])->get('/private/create-product', [PrivateController::class, 'create'])->name('create_product');
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/private/edit-product/{id}', [ProductController::class, 'edit'])->name('edit_product');

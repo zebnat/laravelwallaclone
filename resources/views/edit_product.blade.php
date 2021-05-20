@@ -4,10 +4,11 @@
 <section class="section">
     <div class="container is-max-desktop">
         <h1 class="title is-1">{{ $h1 ?? 'Edita producto' }}</h1>
-        <!--
+        @if(Session::has('success'))
         <div class="notification is-success">
-        Se actualizó satisfactoriamente! <a href="producto.php?id=1">Ver producto</a>
-        </div>-->
+        Se actualizó satisfactoriamente! <a href="{{ route('product', $product->id) }}">Ver producto</a>
+        </div>
+        @endif
         <form action="{{ route('product', $product->id) }}" method="POST">
             @csrf
             @method('PUT')

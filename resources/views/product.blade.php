@@ -12,7 +12,9 @@
             </div>
             <div class="section" style="border-top: 1px solid rgb(218, 218, 218); padding-top: 15px">
                 <h1 class="title is-3">{{ $product->name }}</h1>
-                <label class="title is-3">{{ $product->price }} €</label>
+                <p><label class="title is-3">{{ $product->price }} €</label></p>
+                <p><label class="title is-4">{{ $product->category->name }}</label></p>
+                <p><label class="title is-5">Vendedor: {{ $product->user->name }}</label></p>
             </div>
 
             <div class="section" style="border-top: 1px solid rgb(218, 218, 218);">

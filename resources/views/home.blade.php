@@ -12,11 +12,15 @@
                         <div class="control">
                             <div class="select">
                                 <select id="category" name="cat">
-                                    <option value=""></option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
+                                    <option value="">Selecciona categoría</option>
+                                    @foreach($cats as $cat)
+                                    <option 
+                                        class="option" 
+                                        @if(Request::get('cat') == $cat->id) {{ 'selected' }} @endif 
+                                        value="{{ $cat->id }}">
+                                        {{ $cat->name }}
+                                    </option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -24,7 +28,7 @@
                     <div class="field">
                         <label class="label" for="search">Buscar</label>
                         <div class="control">
-                            <input class="input" id="search" type="text" name="search" placeholder="" value="">
+                            <input class="input" id="search" type="text" name="search" placeholder="Busca tu producto" value="@if(Request::get('search')) {{ Request::get('search') }} @endif">
                         </div>
                     </div>
                 </div>
@@ -32,14 +36,16 @@
                     <div class="field">
                         <label class="label" for="minprice">Precio mínimo</label>
                         <div class="control">
-                            <input class="input @error('minPrice') is-danger @enderror" id="minprice" type="number" name="minPrice" placeholder="0" value="">
+                            <input class="input @error('minPrice') is-danger @enderror" id="minprice" type="number" name="minPrice" placeholder="0" 
+                            value="@if(Request::get('minPrice') !== 0){{ Request::get('minPrice') }}@endif">
                         </div>
                         @error('minPrice') <small>{{ $message }}</small>@enderror
                     </div>
                     <div class="field">
                         <label class="label" for="maxprice">Precio máximo</label>
                         <div class="control">
-                            <input class="input @error('maxPrice') is-danger @enderror" id="maxprice" type="number" name="maxPrice" placeholder="0" value="">
+                            <input class="input @error('maxPrice') is-danger @enderror" id="maxprice" type="number" name="maxPrice" placeholder="" 
+                            value="@if(Request::get('maxPrice') !== 0){{ Request::get('maxPrice') }}@endif">
                         </div>
                         @error('maxPrice') <small>{{ $message }}</small>@enderror
                     </div>
@@ -76,13 +82,12 @@
                         <button type="submit" class="button is-link">Filtrar</button>
                     </div>
                 </div>
-
             </div>
         </form>
     </div>
 </section>
 <section class="section">
-<p>{{ count($products) }} Product(s)</p>
+<p>Total: {{ $products->total() }} Product(s)</p>
 </section>
 <section class="section columns is-multiline">
     @foreach($products as $product)
@@ -97,13 +102,19 @@
         <div class="card-content">
             <div class="media-content">
                 <p class="title is-4">{{ $product->name }}</p>
-                <p class="subtitle is-6">{{ $product->price }}€</p>
-                <p class="subtitle is-7">{{ $product->category->name }}</p>
+                <p class="subtitle is-5">{{ $product->price }}€</p>
+                <p class="subtitle is-6"><i>{{ $product->category->name }}</i></p>
             </div>
 
             <div class="content">{{ $product->description }}</div>
         </div>
+        <div class="card-footer">
+            <p class="subtitle is-6">Vendedor: {{ $product->user->name }}</p>
+        </div>
     </a>
     @endforeach
+</section>
+<section class="section">
+    {{  $products->links() }}
 </section>
 @endsection

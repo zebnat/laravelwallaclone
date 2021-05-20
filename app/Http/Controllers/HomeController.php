@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Category;
 
+// enum para ordenar
 abstract class SortBy
 {
     const CREATED_AT = 0;
@@ -12,6 +14,7 @@ abstract class SortBy
     const NAME = 2;
 }
 
+// enum para dirección
 abstract class SortDirection
 {
     const ASC = 0;
@@ -23,53 +26,65 @@ class HomeController extends Controller
     public function index(Request $req) {
         $req->validate([
             'minPrice' => 'nullable|numeric|min:0',
-            'maxPrice' => 'nullable|numeric|min:0'
+            'maxPrice' => 'nullable|numeric|min:0',
+            'cat' => 'nullable'
         ]);
 
-        $products = Product::all();
+        // Recibir colección de productos 
+        // (llama a función privada que está definida debajo)
+        $products = $this->prepareProductsQuery($req)->paginate(3);
+        $categories = Category::all();
 
-        // filtra nombre
+        return view('home', ['products' => $products, 'cats' => $categories]);
+    }
+
+    /*
+     * Tratamiento del query builder de modelo
+     *
+     * Se encarga de preparar todo el tema de filtrar y 
+     * ordenar en el queryBuilder de modelo
+     *
+     */
+    private function prepareProductsQuery(Request $req) {
+        // Inicializamos ProductQueryBuilder
+        $productsBuilder = Product::query();
+
+        // Filtramos por categoría el query si está presente
+        if($req->cat) {
+            $productsBuilder = $productsBuilder
+                                    ->where("category_id", $req->cat);
+        }
+
+        // Filtramos por búsqueda el query
         if($req->search) {
-            $products = $products->filter(function($element, $key) use($req) {
-                $filter = (str_contains(strtolower($element->name), strtolower($req->search)) ||
-                    str_contains(strtolower($element->description), strtolower($req->search)));
-
-                return $filter;
-            });
+            $productsBuilder = $productsBuilder
+                                    ->where("name", "LIKE", "%".$req->search."%")
+                                    ->orWhere("description", "LIKE", "%".$req->search."%");
         }
 
-        // filtra precio
+        // Filtramos por precios mínimo y máximo
         if($req->minPrice) {
-            $products = $products->filter(function($element, $key) use($req) {
-                return $element->price >= $req->minPrice;
-            });
+            $productsBuilder = $productsBuilder->where("price", ">=", $req->minPrice);
         }
-
         if($req->maxPrice) {
-            $products = $products->filter(function($element, $key) use($req) {
-                return $element->price <= $req->maxPrice;
-            });
+            $productsBuilder = $productsBuilder->where("price", "<=", $req->maxPrice);
         }
 
-        // Ordenación
-        if($req->sortBy == SortBy::CREATED_AT) {
-            $products = (SortDirection::DESC == $req->desc ?
-                $products->sortByDesc('created_at') :
-                $products->sortBy('created_at'));
-        }elseif($req->sortBy == SortBy::PRICE) {
-            $products = (SortDirection::DESC == $req->desc ?
-                $products->sortByDesc('price') :
-                $products->sortBy('price'));
-        }elseif($req->sortBy == SortBy::NAME) {
-            $products = (SortDirection::DESC == $req->desc ?
-                $products->sortByDesc('name') :
-                $products->sortBy('name'));
+        // Ordering query
+        $sortDirection = ($req->desc ? "desc" : "asc");
+        switch($req->sortBy){
+            case SortBy::CREATED_AT :
+                $productsBuilder = $productsBuilder->orderBy("created_at", $sortDirection);
+                break;
+            case SortBy::PRICE :
+                $productsBuilder = $productsBuilder->orderBy("price", $sortDirection);
+                break;
+            case SortBy::NAME :
+                $productsBuilder = $productsBuilder->orderBy("name", $sortDirection);
+                break;
         }
 
-        if($req->sortBy == SortBy::NAME) {
-            $products->sortBy('name');
-        }
+        return $productsBuilder;
 
-        return view('home', ['products' => $products]);
     }
 }

@@ -26,8 +26,9 @@
                     <div class="select @error('category') is-danger @enderror">
                         <select id="category" name="category">
                             <option value="">Selecciona una categoría</option>
-                            <!-- @todo foreach -->
-                            <option value="cat">cat here</option>
+                            @foreach($cats as $cat)
+                                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                            @endforeach
                         </select>
                     </div>
                 </div>
